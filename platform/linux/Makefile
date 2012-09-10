@@ -7,8 +7,8 @@ use_fame = 1
 # profile = 1
 
 
-DEFINC = -I../.. -I. -D__GP2X__ -DA320 -D_UNZIP_SUPPORT \
-	 #-Dmemcpy=memcpy_mips -Dmemset=memset_mips # -DBENCHMARK
+DEFINC = -I../.. -I. -D__GP2X__ -DA320 -D_UNZIP_SUPPORT
+
 GCC = mipsel-linux-gcc
 STRIP = mipsel-linux-strip
 AS = mipsel-linux-gcc
@@ -17,16 +17,16 @@ ifeq "$(profile)" "1"
 COPT_COMMON = -s -O3 -ftracer -fstrength-reduce -Wall -funroll-loops -fomit-frame-pointer -fstrict-aliasing -ffast-math -fprofile-generate
 COPT = $(COPT_COMMON)
 else
-COPT = -O3 -static -fsigned-char -msoft-float -funroll-loops \
-   	-ffast-math -fomit-frame-pointer -fno-strength-reduce \
+COPT = -O3 -fsigned-char -msoft-float -funroll-loops \
+	-ffast-math -fomit-frame-pointer -fno-strength-reduce \
 	-finline-functions -G0 -march=mips32 -mtune=r4600 -mno-mips16
 
 COPT_COMMON = $(COPT)
 endif
 
 # gtk
-COPT    += 
-LDFLAGS += 
+COPT    +=
+LDFLAGS +=
 COPT    += 
 LDFLAGS += 
 
@@ -92,7 +92,7 @@ tidy:
 
 PicoDrive : $(OBJS) 
 	@echo ">>>" $@
-	$(GCC) $(COPT) $^ $(LDFLAGS) -lm -lpng -Wl,-Map=PicoDrive.map -o $@ #mips/memcpy-mips.o mips/memset-mips.o
+	$(GCC) $(COPT) $^ $(LDFLAGS) -lao -lm -lpng -Wl,-Map=PicoDrive.map -o $@
 	$(STRIP) $@ -o $@.dge
 
 mkdirs:
@@ -106,7 +106,7 @@ mkdirs:
 	$(GCC) $(COPT) $(DEFINC) -c $< -o $@
 .s.o:
 	@echo ">>>" $<
-	$(AS) -march=allegrex -mtune=allegrex $< -o $@
+	$(AS) -march=mips32 -mtune=r4600 $< -o $@
 
 Pico/sound/ym2612.o : ../../Pico/sound/ym2612.c
 	@echo ">>>" $@
@@ -114,8 +114,8 @@ Pico/sound/ym2612.o : ../../Pico/sound/ym2612.c
 
 cpu/fame/famec.o : ../../cpu/fame/famec.c ../../cpu/fame/famec_opcodes.h
 	@echo ">>>" $<
-	$(GCC) -O3 -static -fsigned-char -msoft-float \
-   	-ffast-math -fomit-frame-pointer -fno-strength-reduce \
+	$(GCC) -O3 -fsigned-char -msoft-float \
+	-ffast-math -fomit-frame-pointer -fno-strength-reduce \
 	-finline-functions -G0 -march=mips32 -mtune=r4600 -mno-mips16  $(DEFINC) -Wno-unused -c $< -o $@
 
 

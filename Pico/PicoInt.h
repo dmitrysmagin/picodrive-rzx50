@@ -337,7 +337,7 @@ typedef struct
 			unsigned char unused[0x20000];
 		};
 		struct {
-			unsigned char unused[0x20000];
+			unsigned char unused2[0x20000];
 			unsigned char word_ram1M[2][0x20000];
 		};
 	};
