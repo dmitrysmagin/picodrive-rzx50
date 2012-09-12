@@ -1,7 +1,11 @@
 /*
     Platform dependant defines
 */
-#if   defined(__GP2X__)
+#if      defined(__SDL__)
+    #include "../sdl/sdlemu.h"
+    #define SCREEN_WIDTH 320
+    #define SCREEN_BUFFER sdl_screen
+#elif   defined(__GP2X__)
     #include "../gp2x/gp2x.h"
     #define SCREEN_WIDTH 320
     #define SCREEN_BUFFER gp2x_screen

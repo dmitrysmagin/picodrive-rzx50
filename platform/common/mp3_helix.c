@@ -16,7 +16,7 @@ int mp3_get_bitrate(FILE *f, int len)
 }
 
 
-#ifdef __GP2X__
+#if defined(__GP2X__) || defined(__SDL__)
 
 static int mp3_decode(void)
 {
