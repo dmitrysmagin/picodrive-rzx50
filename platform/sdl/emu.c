@@ -645,7 +645,7 @@ static void simpleWait(int thissec, int lim_time)
 
 void emu_Loop(void)
 {
-	static int PsndRate_old = 0, PicoOpt_old = 0, EmuOpt_old = 0, pal_old = 0;
+	static int PsndRate_old = 0, PicoOpt_old = 0, pal_old = 0;
 	char fpsbuff[24]; // fps count c string
 	struct timeval tval; // timing
 	int thissec = 0, frames_done = 0, frames_shown = 0, oldmodes = 0;
@@ -653,6 +653,8 @@ void emu_Loop(void)
 	char *notice = 0;
 
 	printf("entered emu_Loop()\n");
+
+	fpsbuff[0] = 0;
 
 	// make sure we are in correct mode
 	vidResetMode();
