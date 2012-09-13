@@ -696,6 +696,10 @@ void emu_Loop(void)
 	if (PicoMCD & 1) PicoCDBufferInit();
 
 
+	do {
+		gettimeofday(&tval, 0);
+	} while (tval.tv_usec != 0);
+
 	// emulation loop
 	while (engineState == PGS_Running) {
 		int modes;
@@ -757,7 +761,7 @@ void emu_Loop(void)
 			if (PsndOut == 0 && currentConfig.Frameskip >= 0) {
 				frames_done = frames_shown = 0;
 			} else {
-				// it is quite common for this implementation to leave 1 fame unfinished
+				// it is quite common for this implementation to leave 1 frame unfinished
 				// when second changes, but we don't want buffer to starve.
 				if(PsndOut && frames_done < target_fps && frames_done > target_fps-5) {
 					updateKeys();

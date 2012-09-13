@@ -172,7 +172,7 @@ void sdl_start_sound(int rate, int bits, int stereo)
 	as_desired.freq = rate;
 	as_desired.format = AUDIO_S16; // `bits` is always 16
 	as_desired.channels = stereo+1;
-	as_desired.samples = 512;
+	as_desired.samples = 256;
 	as_desired.callback = sdl_sound_callback;
 
 	if(SDL_OpenAudio(&as_desired, &as_obtained) == -1) {
@@ -231,10 +231,10 @@ unsigned long sdl_joystick_read(int allow_usb_joy)
 			SETKEY(SDLK_DOWN, GP2X_DOWN);
 			SETKEY(SDLK_LEFT, GP2X_LEFT);
 			SETKEY(SDLK_RIGHT, GP2X_RIGHT);
-			SETKEY(SDLK_LCTRL, GP2X_A);
-			SETKEY(SDLK_LALT, GP2X_B);
-			SETKEY(SDLK_SPACE, GP2X_X);
-			SETKEY(SDLK_LSHIFT, GP2X_Y);
+			SETKEY(SDLK_LCTRL, GP2X_B);
+			SETKEY(SDLK_LALT, GP2X_X);
+			SETKEY(SDLK_SPACE, GP2X_Y);
+			SETKEY(SDLK_LSHIFT, GP2X_A);
 			SETKEY(SDLK_TAB, GP2X_L);
 			SETKEY(SDLK_BACKSPACE, GP2X_R);
 			SETKEY(SDLK_ESCAPE, GP2X_SELECT);
