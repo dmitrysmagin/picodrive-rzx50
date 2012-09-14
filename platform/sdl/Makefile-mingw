@@ -7,19 +7,21 @@ use_fame = 1
 # profile = 1
 
 
-DEFINC = -I../.. -I.  -D_UNZIP_SUPPORT -D__SDL__
+DEFINC = -I../.. -I. -D__SDL__ -D_UNZIP_SUPPORT
 
 GCC = gcc
 STRIP = strip
 AS = gcc
 
-COPT = -O2
-
+ifeq "$(profile)" "1"
+COPT = -Wall -O2 -Wno-unused #-fprofile-generate=D:/Progs/cygwin/home/picodrive-1.35b/platform/sdl
 COPT_COMMON = $(COPT)
+else
+COPT = -Wall -O2 -Wno-unused #-fprofile-use
+COPT_COMMON = $(COPT)
+endif
 
-
-# 
-COPT    += 
+# librarues 
 LDFLAGS += -static -lpng -Wl,-Bdynamic -lSDL -lSDLmain -lm
 
 # frontend
@@ -76,19 +78,19 @@ endif
 endif
 
 vpath %.c = ../..
+vpath %.s = ../..
+
 DIRS = platform platform/common Pico Pico/cd Pico/sound zlib unzip \
 	cpu cpu/musashi cpu/fame cpu/mz80 cpu/cz80
 
 all: mkdirs PicoDrive
 
 clean: tidy
-	@$(RM) PicoDrive
+	@$(RM) bin/PicoDrive.exe
 
 tidy:
 	$(RM) $(OBJS)
-	rm -rf $(DIRS)
-	@make -C ../../cpu/mz80/ clean
-	@make -C ../common/helix/ clean
+	#rm -rf $(DIRS)
 
 PicoDrive : $(OBJS) 
 	@echo ">>>" $@
@@ -104,16 +106,9 @@ mkdirs:
 .c.o:
 	@echo ">>>" $<
 	$(GCC) $(COPT) $(DEFINC) -c $< -o $@
+
 .s.o:
 	@echo ">>>" $<
 	$(AS) -march=mips32 -mtune=r4600 $< -o $@
 
-Pico/sound/ym2612.o : ../../Pico/sound/ym2612.c
-	@echo ">>>" $@
-	$(GCC) $(COPT_COMMON) $(DEFINC) -c $< -o $@
-
 cpu/fame/famec.o : ../../cpu/fame/famec.c ../../cpu/fame/famec_opcodes.h
-	@echo ">>>" $<
-	$(GCC) -O3 $(DEFINC) -Wno-unused -c $< -o $@
-
-

@@ -14,21 +14,19 @@ STRIP = mipsel-linux-strip
 AS = mipsel-linux-gcc
 
 ifeq "$(profile)" "1"
-COPT_COMMON = -s -O3 -ftracer -fstrength-reduce -Wall -funroll-loops -fomit-frame-pointer -fstrict-aliasing -ffast-math -fprofile-generate
+COPT_COMMON = -O3 -fsigned-char -msoft-float -funroll-loops -Wno-unused \
+	-ffast-math -fomit-frame-pointer -fno-strength-reduce \
+	-finline-functions -G0 -march=mips32 -mtune=r4600 -mno-mips16 -fprofile-generate=/mnt/memory/emulator/picodrive
 COPT = $(COPT_COMMON)
 else
-COPT = -O3 -fsigned-char -msoft-float -funroll-loops \
+COPT_COMMON = -O3 -fsigned-char -msoft-float -funroll-loops -Wno-unused \
 	-ffast-math -fomit-frame-pointer -fno-strength-reduce \
-	-finline-functions -G0 -march=mips32 -mtune=r4600 -mno-mips16
-
-COPT_COMMON = $(COPT)
+	-finline-functions -G0 -march=mips32 -mtune=r4600 -mno-mips16 -fprofile-use
+COPT = $(COPT_COMMON)
 endif
 
-# gtk
-COPT    +=
-LDFLAGS +=
-COPT    += 
-LDFLAGS += 
+# libraries
+LDFLAGS += -lSDL -lm -lpng
 
 # frontend
 OBJS += main.o menu.o emu.o blit.o sdlemu.o log_io.o
@@ -40,6 +38,7 @@ OBJS += platform/common/emu.o platform/common/menu.o platform/common/fonts.o \
 # Pico
 OBJS += Pico/Area.o Pico/Cart.o Pico/Memory.o Pico/Misc.o Pico/Pico.o Pico/Sek.o \
 		Pico/VideoPort.o Pico/Draw2.o Pico/Draw.o Pico/Patch.o
+
 # Pico - CD
 OBJS += Pico/cd/Pico.o Pico/cd/Memory.o Pico/cd/Sek.o Pico/cd/LC89510.o \
 		Pico/cd/cd_sys.o Pico/cd/cd_file.o Pico/cd/gfx_cd.o \
@@ -83,23 +82,23 @@ endif
 endif
 
 vpath %.c = ../..
+vpath %.s = ../..
+
 DIRS = platform platform/common Pico Pico/cd Pico/sound zlib unzip \
 	cpu cpu/musashi cpu/fame cpu/mz80 cpu/cz80
 
 all: mkdirs PicoDrive
 
 clean: tidy
-	@$(RM) PicoDrive
+	@$(RM) bin/PicoDrive bin/PicoDrive.dge
 
 tidy:
 	$(RM) $(OBJS)
-	rm -rf $(DIRS)
-	@make -C ../../cpu/mz80/ clean
-	@make -C ../common/helix/ clean
+	#rm -rf $(DIRS)
 
 PicoDrive : $(OBJS) 
 	@echo ">>>" $@
-	$(GCC) $(COPT) $^ $(LDFLAGS) -lSDL -lm -lpng -Wl,-Map=PicoDrive.map -o bin/$@
+	$(GCC) $(COPT) $^ $(LDFLAGS) -o bin/$@
 	$(STRIP) bin/$@ -o bin/$@.dge
 
 mkdirs:
@@ -111,18 +110,12 @@ mkdirs:
 .c.o:
 	@echo ">>>" $<
 	$(GCC) $(COPT) $(DEFINC) -c $< -o $@
+
 .s.o:
 	@echo ">>>" $<
 	$(AS) -march=mips32 -mtune=r4600 $< -o $@
 
-Pico/sound/ym2612.o : ../../Pico/sound/ym2612.c
-	@echo ">>>" $@
-	$(GCC) $(COPT_COMMON) $(DEFINC) -c $< -o $@
-
 cpu/fame/famec.o : ../../cpu/fame/famec.c ../../cpu/fame/famec_opcodes.h
-	@echo ">>>" $<
-	$(GCC) -O3 -fsigned-char -msoft-float \
-	-ffast-math -fomit-frame-pointer -fno-strength-reduce \
-	-finline-functions -G0 -march=mips32 -mtune=r4600 -mno-mips16  $(DEFINC) -Wno-unused -c $< -o $@
+
 
 
