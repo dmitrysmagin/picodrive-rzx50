@@ -512,7 +512,7 @@ static void updateKeys(void)
 
 	keys = sdl_joystick_read(0);
 	if (keys & GP2X_SELECT) {
-		engineState = PGS_Quit; //select_exits ? PGS_Quit : PGS_Menu;
+		engineState = select_exits ? PGS_Quit : PGS_Menu;
 		// wait until select is released, so menu would not resume game
 		while (sdl_joystick_read(1) & GP2X_SELECT) usleep(50*1000);
 	}
