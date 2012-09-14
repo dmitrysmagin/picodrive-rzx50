@@ -80,12 +80,6 @@ void sdl_video_changemode(int bpp)
 	printf("BPP: %i\n", bpp);
 }
 
-void sdl_video_changemode2(int bpp)
-{
-	current_bpp = bpp;
-	printf("BPP: %i\n", bpp);
-}
-
 void sdl_video_setpalette(int *pal, int len)
 {
 	memcpy(current_pal, pal, len*4);

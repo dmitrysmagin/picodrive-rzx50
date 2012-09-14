@@ -1574,7 +1574,7 @@ static void menu_gfx_prepare(void)
 	menu_prepare_bg(rom_data != NULL);
 
 	// switch to 16bpp
-	sdl_video_changemode2(16);
+	sdl_video_changemode(16);
 	sdl_video_RGB_setscaling(0, 320, 240);
 	sdl_video_flip();
 }
