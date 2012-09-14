@@ -695,11 +695,11 @@ void emu_Loop(void)
 	// prepare CD buffer
 	if (PicoMCD & 1) PicoCDBufferInit();
 
-
+#ifndef WIN32
 	do {
 		gettimeofday(&tval, 0);
 	} while (tval.tv_usec != 0);
-
+#endif
 	// emulation loop
 	while (engineState == PGS_Running) {
 		int modes;
