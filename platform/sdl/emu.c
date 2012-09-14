@@ -810,9 +810,17 @@ void emu_Loop(void)
 
 		if (currentConfig.Frameskip < 0 && tval.tv_usec - lim_time >= 300000) // slowdown detection
 			reset_timing = 1;
+		else if (PsndOut != NULL || currentConfig.Frameskip < 0)
+		{
+			// sleep or vsync if we are still too fast
+			// usleep sleeps for ~20ms minimum, so it is not a solution here
+			if (!reset_timing && tval.tv_usec < lim_time)
+			{
+				// we are too fast
+				simpleWait(thissec, lim_time);
+			}
+		}
 
-		// if sound is off, write silence to buffer
-		if(PsndOut == NULL) sdl_sound_write(sndBuffer, PsndLen*4);
 		blit(fpsbuff, notice);
 
 		frames_done++; frames_shown++;

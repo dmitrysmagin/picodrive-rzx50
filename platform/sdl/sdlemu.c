@@ -44,15 +44,14 @@ void sdl_deinit(void)
 }
 
 /* video */
-// called from emu loop
-void sdl_video_flip(void)
+void sdl_video_flip(void) // called from emu loop and menu loop
 {
 	int i;
-	unsigned short *fbp = (unsigned short *)screen->pixels;
 
 	SDL_LockSurface(screen);
 	if (current_bpp == 8)
 	{
+		unsigned short *fbp = (unsigned short *)screen->pixels;
 		unsigned char *pixels = sdl_screen;
 
 		for (i = 320*240; i--;)
@@ -62,9 +61,10 @@ void sdl_video_flip(void)
 	}
 	else
 	{
-		unsigned short *pixels = sdl_screen;
+		unsigned int *fbp = (unsigned int *)screen->pixels;
+		unsigned int *pixels = sdl_screen;
 
-		for (i = 320*240; i--;)
+		for (i = 320*240/2; i--;)
 		{
 			fbp[i] = pixels[i];
 		}
@@ -74,20 +74,16 @@ void sdl_video_flip(void)
 	SDL_Flip(screen);
 }
 
-// called from menu
-void sdl_video_flip2(void)
-{
-	sdl_video_flip();
-}
-
 void sdl_video_changemode(int bpp)
 {
 	current_bpp = bpp;
+	printf("BPP: %i\n", bpp);
 }
 
 void sdl_video_changemode2(int bpp)
 {
 	current_bpp = bpp;
+	printf("BPP: %i\n", bpp);
 }
 
 void sdl_video_setpalette(int *pal, int len)

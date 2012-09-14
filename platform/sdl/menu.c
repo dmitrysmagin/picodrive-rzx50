@@ -113,12 +113,6 @@ static unsigned long wait_for_input_usbjoy(unsigned long interesting, int *joy)
 	return ret;
 }
 
-static void menu_flip(void)
-{
-	sdl_video_flip2();
-}
-
-
 // --------- loading ROM screen ----------
 
 static int cdload_called = 0;
@@ -131,7 +125,7 @@ static void load_progress_cb(int percent)
 	if (len > 320) len = 320;
 	for (ln = 8; ln > 0; ln--, dst += 320)
 		memset(dst, 0xff, len*2);
-	menu_flip();
+	sdl_video_flip();
 }
 
 static void cdload_progress_cb(int percent)
@@ -148,7 +142,7 @@ static void cdload_progress_cb(int percent)
 	if (len > 320) len = 320;
 	for (ln = 8; ln > 0; ln--, dst += 320)
 		memset(dst, 0xff, len*2);
-	menu_flip();
+	sdl_video_flip();
 	cdload_called = 1;
 }
 
@@ -163,7 +157,7 @@ void menu_romload_prepare(const char *rom_name)
 	smalltext_out16(1, 1, "Loading", 0xffff);
 	smalltext_out16_lim(1, 10, p, 0xffff, 53);
 	sdl_memcpy_buffers(3, sdl_screen, 0, 320*240*2);
-	menu_flip();
+	sdl_video_flip();
 	PicoCartLoadProgressCB = load_progress_cb;
 	PicoCDLoadProgressCB = cdload_progress_cb;
 	cdload_called = 0;
@@ -173,7 +167,7 @@ void menu_romload_end(void)
 {
 	PicoCartLoadProgressCB = PicoCDLoadProgressCB = NULL;
 	smalltext_out16(1, cdload_called ? 60 : 30, "Starting emulation...", 0xffff);
-	menu_flip();
+	sdl_video_flip();
 }
 
 // -------------- ROM selector --------------
@@ -225,7 +219,7 @@ static void draw_dirlist(char *curdir, struct dirent **namelist, int n, int sel)
 		}
 	}
 	text_out16(5, 120, ">");
-	menu_flip();
+	sdl_video_flip();
 #endif
 }
 
@@ -397,7 +391,7 @@ static void draw_debug(void)
 		if (*p == 0) break;
 		p++; str = p;
 	}
-	menu_flip();
+	sdl_video_flip();
 }
 
 static void debug_menu_loop(void)
@@ -428,7 +422,7 @@ static void draw_patchlist(int sel)
 	if (pos < 24) smalltext_out16_lim(14, pos*10, "done", 0xffff, 4);
 
 	text_out16(5, 120, ">");
-	menu_flip();
+	sdl_video_flip();
 }
 
 
@@ -546,7 +540,7 @@ static void draw_savestate_menu(int menu_sel, int is_loading)
 	}
 	text_out16(tl_x, y, "back");
 
-	menu_flip();
+	sdl_video_flip();
 }
 
 static int savestate_menu_loop(int is_loading)
@@ -586,20 +580,6 @@ static int savestate_menu_loop(int is_loading)
 }
 
 // -------------- key config --------------
-
-static char *usb_joy_key_name(int joy, int num)
-{
-	static char name[16];
-	switch (num)
-	{
-		case 0: sprintf(name, "Joy%i UP", joy); break;
-		case 1: sprintf(name, "Joy%i DOWN", joy); break;
-		case 2: sprintf(name, "Joy%i LEFT", joy); break;
-		case 3: sprintf(name, "Joy%i RIGHT", joy); break;
-		default:sprintf(name, "Joy%i b%i", joy, num-3); break;
-	}
-	return name;
-}
 
 static char *action_binds(int player_idx, int action_mask)
 {
@@ -705,7 +685,7 @@ static void draw_key_config(const bind_action_t *opts, int opt_cnt, int player_i
 		text_out16(30, 200, "to save controls");
 		text_out16(30, 210, "Press A or B to exit");
 	}
-	menu_flip();
+	sdl_video_flip();
 }
 
 static void key_config_loop(const bind_action_t *opts, int opt_cnt, int player_idx)
@@ -776,7 +756,7 @@ static void draw_kc_sel(int menu_sel)
 	text_out16(tl_x, (y+=10), "Emulator controls");
 	text_out16(tl_x, (y+=10), "Done");
 
-	menu_flip();
+	sdl_video_flip();
 }
 
 
@@ -905,7 +885,7 @@ static void draw_cd_menu_options(int menu_sel, struct bios_names_t *bios_names)
 		(selected_id == MA_CDOPT_TESTBIOS_JAP && strcmp(bios_names->jp, "NOT FOUND")))
 			text_out16(tl_x, 210, "Press start to test selected BIOS");
 
-	menu_flip();
+	sdl_video_flip();
 }
 
 static void cd_menu_loop_options(void)
@@ -1025,7 +1005,7 @@ static void draw_amenu_options(int menu_sel)
 
 	me_draw(opt2_entries, OPT2_ENTRY_COUNT, tl_x, tl_y, menu_opt2_cust_draw, NULL);
 
-	menu_flip();
+	sdl_video_flip();
 }
 
 static void amenu_loop_options(void)
@@ -1181,7 +1161,7 @@ static void draw_menu_options(int menu_sel)
 
 	me_draw(opt_entries, OPT_ENTRY_COUNT, tl_x, tl_y, menu_opt_cust_draw, NULL);
 
-	menu_flip();
+	sdl_video_flip();
 }
 
 static int sndrate_prevnext(int rate, int dir)
@@ -1386,7 +1366,7 @@ static void draw_menu_credits(void)
 	text_out16(tl_x, (y+=10), "craigix: GP2X hardware");
 	text_out16(tl_x, (y+=10), "ketchupgun: skin design");
 
-	menu_flip();
+	sdl_video_flip();
 }
 
 
@@ -1425,7 +1405,7 @@ static void draw_menu_root(int menu_sel)
 		memset((char *)sdl_screen + 320*224*2, 0, 320*16*2);
 		text_out16(5, 226, menuErrorMsg);
 	}
-	menu_flip();
+	sdl_video_flip();
 }
 
 
@@ -1596,7 +1576,7 @@ static void menu_gfx_prepare(void)
 	// switch to 16bpp
 	sdl_video_changemode2(16);
 	sdl_video_RGB_setscaling(0, 320, 240);
-	menu_flip();
+	sdl_video_flip();
 }
 
 
@@ -1628,7 +1608,7 @@ static void draw_menu_tray(int menu_sel)
 	text_out16(tl_x - 16, tl_y + menu_sel*10, ">");
 	// error
 	if (menuErrorMsg[0]) text_out16(5, 226, menuErrorMsg);
-	menu_flip();
+	sdl_video_flip();
 }
 
 

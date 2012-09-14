@@ -48,30 +48,30 @@ void vidConvCpyRGB32hi(void *to, void *from, int pixels)
 
 void vidCpyM2_40col(void *dest, void *src)
 {
-	unsigned char *pd = dest, *ps = src;
+	unsigned int *pd = dest, *ps = src;
 	int i, u;
 
 	for (i = 0; i < 224; i++)
 	{
-		ps += 8;
-		for (u = 0; u < 320; u++)
+		ps += 8/4;
+		for (u = 0; u < 320/4; u++)
 			*pd++ = *ps++;
 	}
 }
 
 void vidCpyM2_32col(void *dest, void *src)
 {
-	unsigned char *pd = dest, *ps = src;
+	unsigned int *pd = dest, *ps = src;
 	int i, u;
 
 	for (i = 0; i < 224; i++)
 	{
-		ps += 8;
-		pd += 32;
-		for (u = 0; u < 256; u++)
+		ps += 8/4;
+		pd += 32/4;
+		for (u = 0; u < 256/4; u++)
 			*pd++ = *ps++;
-		ps += 64;
-		pd += 32;
+		ps += 64/4;
+		pd += 32/4;
 	}
 }
 
