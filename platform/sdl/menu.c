@@ -30,8 +30,6 @@
 #include <Pico/Patch.h>
 #include <zlib/zlib.h>
 
-int  mmuhack_status;
-
 static const char *gp2xKeyNames[] = {
 	"A",     "B",      "Y",      "???",  "???",  "LEFT",  "UP",   "???",      //0
 	"???",   "???",    "???",    "???",  "???",  "???",   "L",    "R",     //8
@@ -989,9 +987,6 @@ static void menu_opt2_cust_draw(const menu_entry *entry, int x, int y, void *par
 {
 	if (entry->id == MA_OPT2_GAMMA)
 		text_out16(x, y, "Gamma correction           %i.%02i", currentConfig.gamma / 100, currentConfig.gamma%100);
-	else if (entry->id == MA_OPT2_SQUIDGEHACK)
-		text_out16(x, y, "squidgehack (now %s %s", mmuhack_status ? "active)  " : "inactive)",
-			(currentConfig.EmuOpt&0x0010)?"ON":"OFF");
 }
 
 
