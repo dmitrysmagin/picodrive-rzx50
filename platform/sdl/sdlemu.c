@@ -16,6 +16,7 @@
 
 void *sdl_screen; // working buffer 320*230*2 + 320*2
 SDL_Surface *screen;
+SDL_Surface *menu_screen;
 static int current_bpp = 8;
 static int current_pal[256];
 
@@ -33,6 +34,8 @@ void sdl_init(void)
 
 	sdl_screen = malloc(320*240*2 + 320*2);
 	memset(sdl_screen, 0, 320*240*2 + 320*2);
+
+	menu_screen = SDL_CreateRGBSurfaceFrom(sdl_screen, 320, 240, 16, 640, 0xF800, 0x7E0, 0x1F, 0);
 }
 
 char *ext_menu = 0, *ext_state = 0;
@@ -71,6 +74,17 @@ void sdl_video_flip(void) // called from emu loop and menu loop
 	}
 	SDL_UnlockSurface(screen);
 
+	SDL_Flip(screen);
+}
+
+void sdl_menu_flip(void)
+{
+	SDL_Rect dst;
+
+	dst.x = (screen->w - 320) / 2;
+	dst.y = (screen->h - 240) / 2;
+
+	SDL_BlitSurface(menu_screen, 0, screen, &dst);
 	SDL_Flip(screen);
 }
 
