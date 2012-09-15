@@ -1046,6 +1046,7 @@ static void amenu_loop_options(void)
 
 menu_entry opt_entries[] =
 {
+	{ NULL,                        MB_NONE,  MA_OPT_SCALING,       NULL, 0, 0, 0, 1 },
 	{ NULL,                        MB_NONE,  MA_OPT_RENDERER,      NULL, 0, 0, 0, 1 },
 	{ "Accurate timing (slower)",  MB_ONOFF, MA_OPT_ACC_TIMING,    &currentConfig.PicoOpt, 0x040, 0, 0, 1 },
 	{ "Accurate sprites (slower)", MB_ONOFF, MA_OPT_ACC_SPRITES,   &currentConfig.PicoOpt, 0x080, 0, 0, 1 },
@@ -1058,7 +1059,7 @@ menu_entry opt_entries[] =
 	{ "Use SRAM/BRAM savestates",  MB_ONOFF, MA_OPT_SRAM_STATES,   &currentConfig.EmuOpt,  0x001, 0, 0, 1 },
 	{ NULL,                        MB_NONE,  MA_OPT_CONFIRM_STATES,NULL, 0, 0, 0, 1 },
 	{ "Save slot",                 MB_RANGE, MA_OPT_SAVE_SLOT,     &state_slot, 0, 0, 9, 1 },
-	{ NULL,                        MB_NONE,  MA_OPT_CPU_CLOCKS,    NULL, 0, 0, 0, 1 },
+//	{ NULL,                        MB_NONE,  MA_OPT_CPU_CLOCKS,    NULL, 0, 0, 0, 1 },
 	{ "[Sega/Mega CD options]",    MB_NONE,  MA_OPT_SCD_OPTS,      NULL, 0, 0, 0, 1 },
 	{ "[advanced options]",        MB_NONE,  MA_OPT_ADV_OPTS,      NULL, 0, 0, 0, 1 },
 	{ NULL,                        MB_NONE,  MA_OPT_SAVECFG,       NULL, 0, 0, 0, 1 },
@@ -1098,6 +1099,13 @@ static void menu_opt_cust_draw(const menu_entry *entry, int x, int y, void *para
 
 	switch (entry->id)
 	{
+		case MA_OPT_SCALING:
+			if(sdl_video_scaling == 0)
+				str = " normal";
+			else
+				str = " fullscreen";
+			text_out16(x, y, "Image scaling:            %s", str);
+			break;
 		case MA_OPT_RENDERER:
 			if (currentConfig.PicoOpt&0x10)
 				str = " 8bit fast";
@@ -1237,6 +1245,9 @@ static int menu_loop_options(void)
 		if (inp & (GP2X_LEFT|GP2X_RIGHT)) { // multi choice
 			if (!me_process(opt_entries, OPT_ENTRY_COUNT, selected_id, (inp&GP2X_RIGHT) ? 1 : 0)) {
 				switch (selected_id) {
+					case MA_OPT_SCALING:
+						sdl_video_scaling ^= 1;
+						break;
 					case MA_OPT_RENDERER:
 						if (inp & GP2X_LEFT) {
 							currentConfig.PicoOpt&= ~0x10;

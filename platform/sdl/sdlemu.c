@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <SDL/SDL.h>
 
 #include "sdlemu.h"
@@ -18,7 +19,10 @@ void *sdl_screen; // working buffer 320*230*2 + 320*2
 SDL_Surface *screen;
 SDL_Surface *menu_screen;
 static int current_bpp = 8;
-static int current_pal[256];
+int current_pal[256*256];
+static int screen_offset;
+
+int sdl_video_scaling = 0; // 0 - no scaling, 1 - fullscreen
 
 void sdl_init(void)
 {
@@ -29,13 +33,31 @@ void sdl_init(void)
 	}
 	printf("Ok.\n");
 
-	screen = SDL_SetVideoMode(320, 240, 16, SDL_SWSURFACE);
+	//screen = SDL_SetVideoMode(320, 240, 16, SDL_SWSURFACE);
+    {
+        int i = 0; // 0 - 320x240, 1 - 400x240, 2 - 480x272
+        int surfacewidth, surfaceheight;
+        #define NUMOFVIDEOMODES 3
+        struct { int x; int y; } vm[NUMOFVIDEOMODES] = { {320, 240}, {400, 240}, {480, 272} };
+
+        // check 3 videomodes: 480x272, 400x240, 320x240
+        for(i = NUMOFVIDEOMODES-1; i >= 0; i--) {
+            if(SDL_VideoModeOK(vm[i].x, vm[i].y, 16, SDL_HWSURFACE) != 0) {
+                surfacewidth = vm[i].x;
+                surfaceheight = vm[i].y;
+                break;
+            }
+        }
+        screen = SDL_SetVideoMode(surfacewidth, surfaceheight, 16, SDL_HWSURFACE);
+    }
 	SDL_ShowCursor(0);
 
 	sdl_screen = malloc(320*240*2 + 320*2);
 	memset(sdl_screen, 0, 320*240*2 + 320*2);
 
 	menu_screen = SDL_CreateRGBSurfaceFrom(sdl_screen, 320, 240, 16, 640, 0xF800, 0x7E0, 0x1F, 0);
+
+	screen_offset = (screen->h - 240) / 4 * screen->w + (screen->w - 320) / 4;
 }
 
 char *ext_menu = 0, *ext_state = 0;
@@ -49,17 +71,22 @@ void sdl_deinit(void)
 /* video */
 void sdl_video_flip(void) // called from emu loop and menu loop
 {
-	int i;
+	int i, j;
 
 	SDL_LockSurface(screen);
 	if (current_bpp == 8)
 	{
-		unsigned short *fbp = (unsigned short *)screen->pixels;
-		unsigned char *pixels = sdl_screen;
-
-		for (i = 320*240; i--;)
+		if(sdl_video_scaling == 1) upscale_320x224x8_to_480x272((uint32_t *)screen->pixels, (uint8_t *)sdl_screen); else
 		{
-			fbp[i] = current_pal[pixels[i]];
+			unsigned int *fbp = (unsigned int *)screen->pixels + screen_offset;
+			unsigned short *pixels = sdl_screen;
+
+			for(i = 240; i--;) {
+				for (j = 320/2; j--;) {
+					*fbp++ = current_pal[*pixels++];
+				}
+				fbp += (screen->w - 320) / 2;
+			}
 		}
 	}
 	else
@@ -96,7 +123,12 @@ void sdl_video_changemode(int bpp)
 
 void sdl_video_setpalette(int *pal, int len)
 {
+	int i, j;
 	memcpy(current_pal, pal, len*4);
+	for(i = 0; i < 256; i++)
+		for(j = 0; j < 256; j++) {
+			current_pal[i*256+j] = (pal[j] & 0xFFFF) | (pal[i] << 16);
+		}
 }
 
 void sdl_video_RGB_setscaling(int v_offs, int W, int H)

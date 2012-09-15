@@ -29,7 +29,7 @@ endif
 LDFLAGS += -lSDL -lm -lpng
 
 # frontend
-OBJS += main.o menu.o emu.o blit.o sdlemu.o log_io.o
+OBJS += main.o menu.o emu.o blit.o sdlemu.o log_io.o scaler.o
 
 # common
 OBJS += platform/common/emu.o platform/common/menu.o platform/common/fonts.o \

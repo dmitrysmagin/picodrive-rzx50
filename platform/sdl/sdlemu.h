@@ -35,6 +35,7 @@ void sdl_sound_volume(int l, int r);
 unsigned long sdl_joystick_read(int allow_usb_joy);
 
 extern void *sdl_screen;
+extern int sdl_video_scaling;
 
 enum  { GP2X_UP=1<<6,      GP2X_LEFT=1<<5,      GP2X_DOWN=1<<27, GP2X_RIGHT=1<<18,
         GP2X_START=1<<16,  GP2X_SELECT=1<<17,   GP2X_L=1<<14,    GP2X_R=1<<15,
