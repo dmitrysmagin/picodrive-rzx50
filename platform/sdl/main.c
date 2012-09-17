@@ -19,7 +19,7 @@
 #include "emu.h"
 #include "version.h"
 
-extern char *ext_menu, *ext_state;
+char *ext_menu, *ext_state;
 extern int select_exits;
 extern char *PicoConfigFile;
 
