@@ -23,10 +23,10 @@
 
 #include <ao/ao.h>
 
-#include "../gp2x/emu.h"
-#include "../gp2x/gp2x.h"
-#include "../gp2x/usbjoy.h"
-#include "../gp2x/version.h"
+#include "emu.h"
+#include "gp2x.h"
+#include "usbjoy.h"
+#include "version.h"
 
 #include "log_io.h"
 

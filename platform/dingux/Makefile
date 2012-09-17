@@ -31,8 +31,7 @@ COPT    +=
 LDFLAGS += 
 
 # frontend
-OBJS += platform/gp2x/main.o platform/gp2x/menu.o platform/gp2x/emu.o platform/gp2x/usbjoy.o \
-		blit.o gp2x.o log_io.o
+OBJS += main.o menu.o emu.o usbjoy.o blit.o gp2x.o log_io.o
 
 # common
 OBJS += platform/common/emu.o platform/common/menu.o platform/common/fonts.o \
