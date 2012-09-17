@@ -286,7 +286,6 @@ static void blit(const char *fps, const char *notice)
 		if (Pico.m.dirtyPal) {
 			Pico.m.dirtyPal = 0;
 			vidConvCpyRGB32(localPal, Pico.cram, 0x40);
-			//do_pal_convert(localPal, Pico.cram, 1); 
 			// feed new palette to our device
 			sdl_video_setpalette(localPal, 0x40);
 		}
@@ -474,13 +473,16 @@ static void RunEvents(unsigned int which)
 	}
 	if (which & 0x0400) // switch renderer
 	{
-		if   (PicoOpt&0x10)  PicoOpt&=~0x10;
-		else PicoOpt|= 0x10;
+		if      (  PicoOpt&0x10)             { PicoOpt&=~0x10; currentConfig.EmuOpt |= 0x80; }
+		else if (!(currentConfig.EmuOpt&0x80)) PicoOpt|= 0x10;
+		else   currentConfig.EmuOpt &= ~0x80;
 
 		vidResetMode();
 
 		if (PicoOpt&0x10) {
 			strcpy(noticeMsg, " 8bit fast renderer");
+		} else if (currentConfig.EmuOpt&0x80) {
+			strcpy(noticeMsg, "16bit accurate renderer");
 		} else {
 			strcpy(noticeMsg, " 8bit accurate renderer");
 		}
@@ -543,31 +545,10 @@ static void updateKeys(void)
 		}
 	}
 
-	// add joy inputs
-/*
-	if (num_of_joys > 0)
-	{
-		gp2x_usbjoy_update();
-		for (joy = 0; joy < num_of_joys; joy++) {
-			int keys = gp2x_usbjoy_check2(joy);
-			for (i = 0; i < 32; i++) {
-				if (keys & (1 << i)) {
-					int acts = currentConfig.JoyBinds[joy][i];
-					int pl = (acts >> 16) & 1;
-					allActions[pl] |= acts;
-				}
-			}
-		}
-	}
-*/
 	PicoPad[0] = (unsigned short) allActions[0];
 	PicoPad[1] = (unsigned short) allActions[1];
 
 	events = (allActions[0] | allActions[1]) >> 16;
-
-	// volume is treated in special way and triggered every frame
-	//if (events & 0x6000)
-	//	update_volume(1, events & 0x2000);
 
 	if ((events ^ prevEvents) & 0x40)
 		change_fast_forward(events & 0x40);

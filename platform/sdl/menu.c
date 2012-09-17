@@ -1109,6 +1109,8 @@ static void menu_opt_cust_draw(const menu_entry *entry, int x, int y, void *para
 		case MA_OPT_RENDERER:
 			if (currentConfig.PicoOpt&0x10)
 				str = " 8bit fast";
+			else if (currentConfig.EmuOpt&0x80)
+				str = "16bit accurate";
 			else
 				str = " 8bit accurate";
 			text_out16(x, y, "Renderer:            %s", str);
@@ -1250,9 +1252,13 @@ static int menu_loop_options(void)
 						break;
 					case MA_OPT_RENDERER:
 						if (inp & GP2X_LEFT) {
-							currentConfig.PicoOpt&= ~0x10;
+							if      (  currentConfig.PicoOpt&0x10) currentConfig.PicoOpt&= ~0x10;
+							else if (!(currentConfig.EmuOpt &0x80))currentConfig.EmuOpt |=  0x80;
+							else if (  currentConfig.EmuOpt &0x80) break;
 						} else {
-							currentConfig.PicoOpt|=  0x10;
+							if      (  currentConfig.PicoOpt&0x10) break;
+							else if (!(currentConfig.EmuOpt &0x80))currentConfig.PicoOpt|=  0x10;
+							else if (  currentConfig.EmuOpt &0x80) currentConfig.EmuOpt &= ~0x80;
 						}
 						break;
 					case MA_OPT_SOUND_QUALITY:
