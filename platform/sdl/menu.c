@@ -1100,7 +1100,7 @@ static void menu_opt_cust_draw(const menu_entry *entry, int x, int y, void *para
 	switch (entry->id)
 	{
 		case MA_OPT_SCALING:
-			if(sdl_video_scaling == 0)
+			if(currentConfig.scaling == 0)
 				str = " normal";
 			else
 				str = " fullscreen";
@@ -1248,7 +1248,7 @@ static int menu_loop_options(void)
 			if (!me_process(opt_entries, OPT_ENTRY_COUNT, selected_id, (inp&GP2X_RIGHT) ? 1 : 0)) {
 				switch (selected_id) {
 					case MA_OPT_SCALING:
-						sdl_video_scaling ^= 1;
+						currentConfig.scaling ^= 1;
 						break;
 					case MA_OPT_RENDERER:
 						if (inp & GP2X_LEFT) {

@@ -13,6 +13,8 @@
 #include <stdint.h>
 #include <SDL/SDL.h>
 
+#include "../common/emu.h"
+
 #include "sdlemu.h"
 #include "scaler.h"
 
@@ -27,8 +29,6 @@ void sdl_video_flip_400(void);
 void sdl_video_flip_480(void);
 
 void (*sdl_video_flip_p)(void) = sdl_video_flip_320;   
-
-int sdl_video_scaling = 0; // 0 - no scaling, 1 - fullscreen
 
 void sdl_init(void)
 {
@@ -106,7 +106,7 @@ void sdl_video_flip_400(void)
 
 	if (current_bpp == 8)
 	{
-		if(sdl_video_scaling == 1) upscale_320x224x8_to_400x240((uint32_t *)screen->pixels, (uint8_t *)sdl_screen); else
+		if(currentConfig.scaling == 1) upscale_320x224x8_to_400x240((uint32_t *)screen->pixels, (uint8_t *)sdl_screen); else
 		{
 			unsigned int *fbp = (unsigned int *)screen->pixels + (240 - 240) / 4 * 400 + (400 - 320) / 4;
 			unsigned short *pixels = sdl_screen;
@@ -121,7 +121,7 @@ void sdl_video_flip_400(void)
 	}
 	else
 	{
-		if(sdl_video_scaling == 1) upscale_320x224x16_to_400x240((uint32_t *)screen->pixels, (uint32_t *)sdl_screen); else
+		if(currentConfig.scaling == 1) upscale_320x224x16_to_400x240((uint32_t *)screen->pixels, (uint32_t *)sdl_screen); else
 		{
 			unsigned int *fbp = (unsigned int *)screen->pixels + (240 - 240) / 4 * 400 + (400 - 320) / 4;
 			unsigned int *pixels = sdl_screen;
@@ -142,7 +142,7 @@ void sdl_video_flip_480(void)
 
 	if (current_bpp == 8)
 	{
-		if(sdl_video_scaling == 1) upscale_320x224x8_to_480x272((uint32_t *)screen->pixels, (uint8_t *)sdl_screen); else
+		if(currentConfig.scaling == 1) upscale_320x224x8_to_480x272((uint32_t *)screen->pixels, (uint8_t *)sdl_screen); else
 		{
 			unsigned int *fbp = (unsigned int *)screen->pixels + (272 - 240) / 4 * 480 + (480 - 320) / 4;
 			unsigned short *pixels = sdl_screen;
@@ -157,7 +157,7 @@ void sdl_video_flip_480(void)
 	}
 	else
 	{
-		if(sdl_video_scaling == 1) upscale_320x224x16_to_480x272((uint32_t *)screen->pixels, (uint32_t *)sdl_screen); else
+		if(currentConfig.scaling == 1) upscale_320x224x16_to_480x272((uint32_t *)screen->pixels, (uint32_t *)sdl_screen); else
 		{
 			unsigned int *fbp = (unsigned int *)screen->pixels + (272 - 240) / 4 * 480 + (480 - 320) / 4;
 			unsigned int *pixels = sdl_screen;
