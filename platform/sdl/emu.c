@@ -377,7 +377,7 @@ static void vidResetMode(void)
 		sdl_video_setpalette(localPal, 0x100);
 		sdl_memset_all_buffers(0, 0xe0, 320*240);
 		sdl_video_flip();
-	}
+	} else sdl_memset_all_buffers(0, 0, 320*16);
 	Pico.m.dirtyPal = 1;
 	// reset scaling
 	if (currentConfig.scaling == 2 && !(Pico.video.reg[1]&8))
