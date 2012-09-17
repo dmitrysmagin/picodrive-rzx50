@@ -191,6 +191,11 @@ void sdl_menu_flip(void)
 	SDL_Flip(screen);
 }
 
+void sdl_clear_screen(void)
+{
+	SDL_FillRect(screen, NULL, 0);
+}
+
 void sdl_video_changemode(int bpp)
 {
 	current_bpp = bpp;

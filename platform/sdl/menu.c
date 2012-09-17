@@ -1440,6 +1440,8 @@ static void menu_loop_root(void)
 	draw_menu_root(menu_sel);
 	while (sdl_joystick_read(1) & (GP2X_B|GP2X_X|GP2X_SELECT)) usleep(50*1000);
 
+	sdl_clear_screen();
+
 	for (;;)
 	{
 		draw_menu_root(menu_sel);

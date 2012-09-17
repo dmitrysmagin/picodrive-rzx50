@@ -18,6 +18,7 @@ void sdl_deinit(void);
 /* video */
 void sdl_video_flip(void);
 void sdl_menu_flip(void);
+void sdl_clear_screen(void);
 void sdl_video_changemode(int bpp);
 void sdl_video_setpalette(int *pal, int len);
 void sdl_video_RGB_setscaling(int ln_offs, int W, int H);
