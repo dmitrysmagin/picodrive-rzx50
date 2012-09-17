@@ -97,6 +97,7 @@ int main(int argc, char *argv[])
 		set_RAM_Timings(6, 4, 1, 1, 1, 2, 2);
 		printf("done.\n"); fflush(stdout);
 	}
+	sharedmem_init();
 	emu_Init();
 	menu_init();
 
@@ -141,6 +142,7 @@ int main(int argc, char *argv[])
 	endloop:
 
 	emu_Deinit();
+	sharedmem_deinit();
 	cpuctrl_deinit();
 	gp2x_deinit();
 	if(mmuhack_status)

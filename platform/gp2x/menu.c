@@ -25,16 +25,16 @@
 #include <zlib/zlib.h>
 
 #ifndef _DIRENT_HAVE_D_TYPE
-#error "need d_type for file browser"
+#error "need d_type for file browser
 #endif
 
 extern int  mmuhack_status;
 
 static const char *gp2xKeyNames[] = {
-	"A",     "B",      "Y",      "???",  "???",  "LEFT",  "UP",   "???",      //0
-	"???",   "???",    "???",    "???",  "???",  "???",   "L",    "R",     //8
-	"START", "SELECT", "RIGHT",  "X",    "???",  "???",   "POWER","POWER",   //16
-	"???",   "???",    "???",    "DOWN", "???",  "POWER", "???",  "???"       //24   
+	"UP",    "???",    "LEFT", "???",  "DOWN", "???", "RIGHT",    "???",
+	"START", "SELECT", "L",    "R",    "A",    "B",   "X",        "Y",
+	"???",   "???",    "???",  "???",  "???",  "???", "VOL DOWN", "VOL UP",
+	"???",   "???",    "???",  "PUSH", "???",  "???", "???",      "???"
 };
 
 static void menu_darken_bg(void *dst, int pixels, int darker);
@@ -69,6 +69,12 @@ static unsigned long wait_for_input(unsigned long interesting)
 	}
 	inp_prev = ret;
 	inp_prevjoy = 0;
+
+	// we don't need diagonals in menus
+	if ((ret&GP2X_UP)   && (ret&GP2X_LEFT))  ret &= ~GP2X_LEFT;
+	if ((ret&GP2X_UP)   && (ret&GP2X_RIGHT)) ret &= ~GP2X_RIGHT;
+	if ((ret&GP2X_DOWN) && (ret&GP2X_LEFT))  ret &= ~GP2X_LEFT;
+	if ((ret&GP2X_DOWN) && (ret&GP2X_RIGHT)) ret &= ~GP2X_RIGHT;
 
 	return ret;
 }
@@ -714,7 +720,7 @@ static void draw_key_config(const bind_action_t *opts, int opt_cnt, int player_i
 	} else {
 		text_out16(30, 190, "Use Options -> Save cfg");
 		text_out16(30, 200, "to save controls");
-		text_out16(30, 210, "Press A or B to exit");
+		text_out16(30, 210, "Press B or X to exit");
 	}
 	menu_flip();
 }
@@ -787,6 +793,17 @@ static void draw_kc_sel(int menu_sel)
 	text_out16(tl_x, (y+=10), "Player 2");
 	text_out16(tl_x, (y+=10), "Emulator controls");
 	text_out16(tl_x, (y+=10), "Done");
+
+	tl_x = 25;
+	text_out16(tl_x, (y=110), "USB joys detected:");
+	if (num_of_joys > 0) {
+		for (i = 0; i < num_of_joys; i++) {
+			strncpy(joyname, joy_name(joys[i]), 33); joyname[33] = 0;
+			text_out16(tl_x, (y+=10), "%i: %s", i+1, joyname);
+		}
+	} else {
+		text_out16(tl_x, (y+=10), "none");
+	}
 
 	menu_flip();
 }
@@ -1006,12 +1023,17 @@ static void cd_menu_loop_options(void)
 
 menu_entry opt2_entries[] =
 {
+	{ NULL,                        MB_NONE,  MA_OPT2_GAMMA,         NULL, 0, 0, 0, 1 },
+	{ "A_SN's gamma curve",        MB_ONOFF, MA_OPT2_A_SN_GAMMA,    &currentConfig.EmuOpt, 0x1000, 0, 0, 1 },
 	{ "Perfect vsync",             MB_ONOFF, MA_OPT2_VSYNC,         &currentConfig.EmuOpt, 0x2000, 0, 0, 1 },
 	{ "Emulate Z80",               MB_ONOFF, MA_OPT2_ENABLE_Z80,    &currentConfig.PicoOpt,0x0004, 0, 0, 1 },
 	{ "Emulate YM2612 (FM)",       MB_ONOFF, MA_OPT2_ENABLE_YM2612, &currentConfig.PicoOpt,0x0001, 0, 0, 1 },
 	{ "Emulate SN76496 (PSG)",     MB_ONOFF, MA_OPT2_ENABLE_SN76496,&currentConfig.PicoOpt,0x0002, 0, 0, 1 },
 	{ "gzip savestates",           MB_ONOFF, MA_OPT2_GZIP_STATES,   &currentConfig.EmuOpt, 0x0008, 0, 0, 1 },
 	{ "Don't save last used ROM",  MB_ONOFF, MA_OPT2_NO_LAST_ROM,   &currentConfig.EmuOpt, 0x0020, 0, 0, 1 },
+	{ "needs restart:",            MB_NONE,  MA_NONE,               NULL, 0, 0, 0, 1 },
+	{ "craigix's RAM timings",     MB_ONOFF, MA_OPT2_RAMTIMINGS,    &currentConfig.EmuOpt, 0x0100, 0, 0, 1 },
+	{ NULL,                        MB_ONOFF, MA_OPT2_SQUIDGEHACK,   &currentConfig.EmuOpt, 0x0010, 0, 0, 1 },
 	{ "done",                      MB_NONE,  MA_OPT2_DONE,          NULL, 0, 0, 0, 1 },
 };
 
@@ -1084,12 +1106,14 @@ static void amenu_loop_options(void)
 menu_entry opt_entries[] =
 {
 	{ NULL,                        MB_NONE,  MA_OPT_RENDERER,      NULL, 0, 0, 0, 1 },
+	{ NULL,                        MB_RANGE, MA_OPT_SCALING,       &currentConfig.scaling, 0, 0, 3, 1 },
 	{ "Accurate timing (slower)",  MB_ONOFF, MA_OPT_ACC_TIMING,    &currentConfig.PicoOpt, 0x040, 0, 0, 1 },
 	{ "Accurate sprites (slower)", MB_ONOFF, MA_OPT_ACC_SPRITES,   &currentConfig.PicoOpt, 0x080, 0, 0, 1 },
 	{ "Show FPS",                  MB_ONOFF, MA_OPT_SHOW_FPS,      &currentConfig.EmuOpt,  0x002, 0, 0, 1 },
 	{ NULL,                        MB_RANGE, MA_OPT_FRAMESKIP,     &currentConfig.Frameskip, 0, -1, 16, 1 },
 	{ "Enable sound",              MB_ONOFF, MA_OPT_ENABLE_SOUND,  &currentConfig.EmuOpt,  0x004, 0, 0, 1 },
 	{ NULL,                        MB_NONE,  MA_OPT_SOUND_QUALITY, NULL, 0, 0, 0, 1 },
+	{ "Use ARM940 core for sound", MB_ONOFF, MA_OPT_ARM940_SOUND,  &currentConfig.PicoOpt, 0x200, 0, 0, 1 },
 	{ "6 button pad",              MB_ONOFF, MA_OPT_6BUTTON_PAD,   &currentConfig.PicoOpt, 0x020, 0, 0, 1 },
 	{ NULL,                        MB_NONE,  MA_OPT_REGION,        NULL, 0, 0, 0, 1 },
 	{ "Use SRAM/BRAM savestates",  MB_ONOFF, MA_OPT_SRAM_STATES,   &currentConfig.EmuOpt,  0x001, 0, 0, 1 },
@@ -1138,9 +1162,20 @@ static void menu_opt_cust_draw(const menu_entry *entry, int x, int y, void *para
 		case MA_OPT_RENDERER:
 			if (currentConfig.PicoOpt&0x10)
 				str = " 8bit fast";
+			else if (currentConfig.EmuOpt&0x80)
+				str = "16bit accurate";
 			else
 				str = " 8bit accurate";
 			text_out16(x, y, "Renderer:            %s", str);
+			break;
+		case MA_OPT_SCALING:
+			switch (currentConfig.scaling) {
+				default: str = "            OFF";   break;
+				case 1:  str = "hw horizontal";     break;
+				case 2:  str = "hw horiz. + vert."; break;
+				case 3:  str = "sw horizontal";     break;
+			}
+			text_out16(x, y, "Scaling:       %s", str);
 			break;
 		case MA_OPT_FRAMESKIP:
 			if (currentConfig.Frameskip < 0)
@@ -1165,7 +1200,7 @@ static void menu_opt_cust_draw(const menu_entry *entry, int x, int y, void *para
 			text_out16(x, y, "Confirm savestate          %s", str);
 			break;
 		case MA_OPT_CPU_CLOCKS:
-			text_out16(x, y, "A320 CPU clocks            %iMhz", currentConfig.CPUclock);
+			text_out16(x, y, "GP2X CPU clocks            %iMhz", currentConfig.CPUclock);
 			break;
 		case MA_OPT_SAVECFG:
 			str24[0] = 0;
@@ -1276,9 +1311,13 @@ static int menu_loop_options(void)
 				switch (selected_id) {
 					case MA_OPT_RENDERER:
 						if (inp & GP2X_LEFT) {
-							currentConfig.PicoOpt&= ~0x10;
+							if      (  currentConfig.PicoOpt&0x10) currentConfig.PicoOpt&= ~0x10;
+							else if (!(currentConfig.EmuOpt &0x80))currentConfig.EmuOpt |=  0x80;
+							else if (  currentConfig.EmuOpt &0x80) break;
 						} else {
-							currentConfig.PicoOpt|=  0x10;
+							if      (  currentConfig.PicoOpt&0x10) break;
+							else if (!(currentConfig.EmuOpt &0x80))currentConfig.PicoOpt|=  0x10;
+							else if (  currentConfig.EmuOpt &0x80) currentConfig.EmuOpt &= ~0x80;
 						}
 						break;
 					case MA_OPT_SOUND_QUALITY:
@@ -1308,9 +1347,8 @@ static int menu_loop_options(void)
 						 break;
 					case MA_OPT_CPU_CLOCKS:
 						 while ((inp = gp2x_joystick_read(1)) & (GP2X_LEFT|GP2X_RIGHT)) {
-							 currentConfig.CPUclock += (inp & GP2X_LEFT) ? -4 : 4;
-							 if (currentConfig.CPUclock < 300) currentConfig.CPUclock = 300;
-							  else if (currentConfig.CPUclock > 428) currentConfig.CPUclock = 428;
+							 currentConfig.CPUclock += (inp & GP2X_LEFT) ? -1 : 1;
+							 if (currentConfig.CPUclock < 1) currentConfig.CPUclock = 1;
 							 draw_menu_options(menu_sel);
 							 usleep(50*1000);
 						 }

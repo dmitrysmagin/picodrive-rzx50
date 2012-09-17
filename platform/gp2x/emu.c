@@ -28,8 +28,6 @@
 #include <Pico/sound/mix.h>
 #include <zlib/zlib.h>
 
-#include "asm_utils.h" 
-
 //#define PFRAMES
 
 #ifdef BENCHMARK
@@ -197,19 +195,19 @@ void emu_setDefaultConfig(void)
 	currentConfig.PicoRegion = 0; // auto
 	currentConfig.PicoAutoRgnOrder = 0x184; // US, EU, JP
 	currentConfig.Frameskip = -1; // auto
-	currentConfig.CPUclock = 336;
+	currentConfig.CPUclock = 200;
 	currentConfig.volume = 50;
-	currentConfig.KeyBinds[ 6] = 1<<0; // SACB RLDU
-	currentConfig.KeyBinds[27] = 1<<1;
-	currentConfig.KeyBinds[ 5] = 1<<2;
-	currentConfig.KeyBinds[18] = 1<<3;
-	currentConfig.KeyBinds[ 1] = 1<<4;
-	currentConfig.KeyBinds[ 0] = 1<<5;
-	currentConfig.KeyBinds[ 2] = 1<<6;
-	currentConfig.KeyBinds[16] = 1<<7;
-	currentConfig.KeyBinds[19] = 1<<26; // switch rend
-	currentConfig.KeyBinds[14] = 1<<27; // save state
-	currentConfig.KeyBinds[15] = 1<<28; // load state
+	currentConfig.KeyBinds[ 0] = 1<<0; // SACB RLDU
+	currentConfig.KeyBinds[ 4] = 1<<1;
+	currentConfig.KeyBinds[ 2] = 1<<2;
+	currentConfig.KeyBinds[ 6] = 1<<3;
+	currentConfig.KeyBinds[14] = 1<<4;
+	currentConfig.KeyBinds[13] = 1<<5;
+	currentConfig.KeyBinds[12] = 1<<6;
+	currentConfig.KeyBinds[ 8] = 1<<7;
+	currentConfig.KeyBinds[15] = 1<<26; // switch rend
+	currentConfig.KeyBinds[10] = 1<<27; // save state
+	currentConfig.KeyBinds[11] = 1<<28; // load state
 	currentConfig.KeyBinds[23] = 1<<29; // vol up
 	currentConfig.KeyBinds[22] = 1<<30; // vol down
 	currentConfig.gamma = 100;
@@ -298,7 +296,6 @@ static void blit(const char *fps, const char *notice)
 		if (Pico.m.dirtyPal) {
 			Pico.m.dirtyPal = 0;
 			vidConvCpyRGB32(localPal, Pico.cram, 0x40);
-			//do_pal_convert(localPal, Pico.cram, 1); 
 			// feed new palette to our device
 			gp2x_video_setpalette(localPal, 0x40);
 		}
@@ -462,13 +459,12 @@ static void update_volume(int has_changed, int is_up)
 
 	// set the right mixer func
 	if (!(PicoOpt&8)) return; // just use defaults for mono
-//	if (vol >= 5)
+	if (vol >= 5)
 		PsndMix_32_to_16l = mix_32_to_16l_stereo;
-/*	else {
+	else {
 		mix_32_to_16l_level = 5 - vol;
 		PsndMix_32_to_16l = mix_32_to_16l_stereo_lvl;
 	}
-*/	
 }
 
 static void change_fast_forward(int set_on)
@@ -505,7 +501,7 @@ static void RunEvents(unsigned int which)
 				(( (which & 0x1000) && (currentConfig.EmuOpt & 0x800)) ||   // load
 				 (!(which & 0x1000) && (currentConfig.EmuOpt & 0x200))) ) { // save
 			unsigned long keys;
-			blit("", (which & 0x1000) ? "LOAD STATE? (X=yes, B=no)" : "OVERWRITE SAVE? (X=yes, B=no)");
+			blit("", (which & 0x1000) ? "LOAD STATE? (Y=yes, X=no)" : "OVERWRITE SAVE? (Y=yes, X=no)");
 			while( !((keys = gp2x_joystick_read(1)) & (GP2X_X|GP2X_Y)) )
 				usleep(50*1024);
 			if (keys & GP2X_X) do_it = 0;
@@ -523,13 +519,16 @@ static void RunEvents(unsigned int which)
 	}
 	if (which & 0x0400) // switch renderer
 	{
-		if   (PicoOpt&0x10)  PicoOpt&=~0x10;
-		else PicoOpt|= 0x10;
+		if      (  PicoOpt&0x10)             { PicoOpt&=~0x10; currentConfig.EmuOpt |= 0x80; }
+		else if (!(currentConfig.EmuOpt&0x80)) PicoOpt|= 0x10;
+		else   currentConfig.EmuOpt &= ~0x80;
 
 		vidResetMode();
 
 		if (PicoOpt&0x10) {
 			strcpy(noticeMsg, " 8bit fast renderer");
+		} else if (currentConfig.EmuOpt&0x80) {
+			strcpy(noticeMsg, "16bit accurate renderer");
 		} else {
 			strcpy(noticeMsg, " 8bit accurate renderer");
 		}

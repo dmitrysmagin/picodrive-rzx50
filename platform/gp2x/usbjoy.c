@@ -387,7 +387,8 @@ int gp2x_usbjoy_check (int joyno) {
 					case  7: joyExKey |= GP2X_R; break; /* right shoulder button 2 */
 					case  8: joyExKey |= GP2X_SELECT;break;
 					case  9: joyExKey |= GP2X_START; break;
-
+					case 10: joyExKey |= GP2X_PUSH;  break;
+					case 11: joyExKey |= GP2X_PUSH;  break;
 				}
 			}
 		}
