@@ -21,13 +21,12 @@
 
 #include "platform.h"
 
-char brmPath[PATH_MAX] = "brm/";
-char cfgPath[PATH_MAX] = "cfg/";
-char mdsPath[PATH_MAX] = "mds/";
-char srmPath[PATH_MAX] = "srm/";
-char picocfgPath[PATH_MAX] = "picoconfig.bin";
+char *brmPath = "brm/";
+char *cfgPath = "cfg/";
+char *mdsPath = "mds/";
+char *srmPath = "srm/";
 
-char *PicoConfigFile = picocfgPath;
+char *PicoConfigFile = "picoconfig.bin";
 currentConfig_t currentConfig;
 unsigned char *rom_data = NULL;
 char noticeMsg[64];

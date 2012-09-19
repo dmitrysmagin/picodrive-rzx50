@@ -37,11 +37,10 @@ extern int state_slot;
 extern int config_slot, config_slot_current;
 extern unsigned char *movie_data;
 
-extern char brmPath[PATH_MAX];
-extern char cfgPath[PATH_MAX];
-extern char mdsPath[PATH_MAX];
-extern char srmPath[PATH_MAX];
-extern char picocfgPath[PATH_MAX];
+extern char *brmPath;
+extern char *cfgPath;
+extern char *mdsPath;
+extern char *srmPath;
 
 int   emu_ReloadRom(void);
 int   emu_SaveLoadGame(int load, int sram);

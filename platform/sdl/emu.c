@@ -34,7 +34,7 @@ int engineState;
 int select_exits = 0;
 
 char romFileName[PATH_MAX];
-char homePath[PATH_MAX] = "";
+char *homePath;
 
 static short sndBuffer[2*44100/50];
 static struct timeval noticeMsgTime = { 0, 0 }; // when started showing
@@ -129,6 +129,7 @@ void emu_Init(void)
 	}
 
 	// make dirs for saves, cfgs, etc.
+	homePath = malloc(PATH_MAX);
 #ifndef WIN32
 	p = getenv("HOME");
 	sprintf(homePath, !p ? ".picodrive/" : "%s/.picodrive/", p);
@@ -140,30 +141,24 @@ void emu_Init(void)
 		mkdir(homePath, 0777);
 	}
 
-	sprintf(picocfgPath, "%spicoconfig.bin", homePath);
-	PicoConfigFile = picocfgPath;
+	PicoConfigFile = malloc(PATH_MAX);
+	sprintf(PicoConfigFile, "%spicoconfig.bin", homePath);
 
-	sprintf(brmPath, "%sbrm/", homePath);
-	mkdir(brmPath, 0777);
-	sprintf(cfgPath, "%scfg/", homePath);
-	mkdir(cfgPath, 0777);
-	sprintf(mdsPath, "%smds/", homePath);
-	mkdir(mdsPath, 0777);
-	sprintf(srmPath, "%ssrm/", homePath);
-	mkdir(srmPath, 0777);
+	brmPath = malloc(PATH_MAX); sprintf(brmPath, "%sbrm/", homePath); mkdir(brmPath, 0777);
+	cfgPath = malloc(PATH_MAX); sprintf(cfgPath, "%scfg/", homePath); mkdir(cfgPath, 0777);
+	mdsPath = malloc(PATH_MAX); sprintf(mdsPath, "%smds/", homePath); mkdir(mdsPath, 0777);
+	srmPath = malloc(PATH_MAX);	sprintf(srmPath, "%ssrm/", homePath); mkdir(srmPath, 0777);
 #else
 	sprintf(homePath, ".picodrive/");
 	mkdir(homePath);
-	PicoConfigFile = ".picodrive/picoconfig.bin";
 
-	sprintf(brmPath, "%sbrm/", homePath);
-	mkdir(brmPath);
-	sprintf(cfgPath, "%scfg/", homePath);
-	mkdir(cfgPath);
-	sprintf(mdsPath, "%smds/", homePath);
-	mkdir(mdsPath);
-	sprintf(srmPath, "%ssrm/", homePath);
-	mkdir(srmPath);
+	PicoConfigFile = malloc(PATH_MAX);
+	sprintf(PicoConfigFile, ".picodrive/picoconfig.bin");
+
+	brmPath = malloc(PATH_MAX); sprintf(brmPath, "%sbrm/", homePath); mkdir(brmPath);
+	cfgPath = malloc(PATH_MAX); sprintf(cfgPath, "%scfg/", homePath); mkdir(cfgPath);
+	mdsPath = malloc(PATH_MAX); sprintf(mdsPath, "%smds/", homePath); mkdir(mdsPath);
+	srmPath = malloc(PATH_MAX);	sprintf(srmPath, "%ssrm/", homePath); mkdir(srmPath);
 #endif
 
 	PicoInit();
@@ -199,6 +194,13 @@ void emu_Deinit(void)
 	}
 
 	free(PicoDraw2FB);
+
+	free(homePath);
+	free(brmPath);
+	free(cfgPath);
+	free(mdsPath);
+	free(srmPath);
+	free(PicoConfigFile);
 
 	PicoExit();
 }
