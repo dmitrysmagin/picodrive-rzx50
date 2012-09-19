@@ -3,6 +3,8 @@
 
 // For commercial use, separate licencing terms must be obtained.
 
+#include <limits.h>
+
 typedef struct {
 	char lastRomFile[512];
 	int EmuOpt;		// LSb->MSb: use_sram, show_fps, enable_sound, gzip_saves,
@@ -35,6 +37,11 @@ extern int state_slot;
 extern int config_slot, config_slot_current;
 extern unsigned char *movie_data;
 
+extern char brmPath[PATH_MAX];
+extern char cfgPath[PATH_MAX];
+extern char mdsPath[PATH_MAX];
+extern char srmPath[PATH_MAX];
+extern char picocfgPath[PATH_MAX];
 
 int   emu_ReloadRom(void);
 int   emu_SaveLoadGame(int load, int sram);

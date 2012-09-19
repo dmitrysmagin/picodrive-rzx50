@@ -21,7 +21,13 @@
 
 #include "platform.h"
 
-char *PicoConfigFile = "picoconfig.bin";
+char brmPath[PATH_MAX] = "brm/";
+char cfgPath[PATH_MAX] = "cfg/";
+char mdsPath[PATH_MAX] = "mds/";
+char srmPath[PATH_MAX] = "srm/";
+char picocfgPath[PATH_MAX] = "picoconfig.bin";
+
+char *PicoConfigFile = picocfgPath;
 currentConfig_t currentConfig;
 unsigned char *rom_data = NULL;
 char noticeMsg[64];
@@ -434,7 +440,7 @@ int emu_ReadConfig(int game, int no_defaults)
 		if (config_slot != 0)
 		     sprintf(extbuf, ".%i.pbcfg", config_slot);
 		else strcpy(extbuf, ".pbcfg");
-		romfname_ext(cfg, "cfg/", extbuf);
+		romfname_ext(cfg, cfgPath, extbuf);
 		f = fopen(cfg, "rb");
 		if (!f) romfname_ext(cfg, NULL, ".pbcfg");
 		else fclose(f);
@@ -495,7 +501,7 @@ int emu_WriteConfig(int game)
 		if (config_slot != 0)
 		     sprintf(extbuf, ".%i.pbcfg", config_slot);
 		else strcpy(extbuf, ".pbcfg");
-		romfname_ext(cfg, "cfg/", extbuf);
+		romfname_ext(cfg, cfgPath, extbuf);
 	}
 
 	lprintf("emu_WriteConfig: %s ", cfg);
@@ -627,7 +633,7 @@ char *emu_GetSaveFName(int load, int is_sram, int slot)
 
 	if (is_sram)
 	{
-		romfname_ext(saveFname, (PicoMCD&1) ? "brm/" : "srm/", (PicoMCD&1) ? ".brm" : ".srm");
+		romfname_ext(saveFname, (PicoMCD&1) ? brmPath : srmPath, (PicoMCD&1) ? ".brm" : ".srm");
 		if (load) {
 			if (try_ropen_file(saveFname)) return saveFname;
 			// try in current dir..
@@ -642,7 +648,7 @@ char *emu_GetSaveFName(int load, int is_sram, int slot)
 		if(slot > 0 && slot < 10) sprintf(ext, ".%i", slot);
 		strcat(ext, (currentConfig.EmuOpt & 8) ? ".mds.gz" : ".mds");
 
-		romfname_ext(saveFname, "mds/", ext);
+		romfname_ext(saveFname, mdsPath, ext);
 		if (load) {
 			if (try_ropen_file(saveFname)) return saveFname;
 			romfname_ext(saveFname, NULL, ext);
@@ -652,7 +658,7 @@ char *emu_GetSaveFName(int load, int is_sram, int slot)
 				if(slot > 0 && slot < 10) sprintf(ext, ".%i", slot);
 				strcat(ext, ".mds");
 
-				romfname_ext(saveFname, "mds/", ext);
+				romfname_ext(saveFname, mdsPath, ext);
 				if (try_ropen_file(saveFname)) return saveFname;
 				romfname_ext(saveFname, NULL, ext);
 				if (try_ropen_file(saveFname)) return saveFname;

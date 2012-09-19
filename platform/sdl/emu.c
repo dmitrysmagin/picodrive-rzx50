@@ -13,6 +13,7 @@
 #include <string.h>
 #include <limits.h>
 #include <sys/time.h>
+#include <errno.h>
 
 #include "emu.h"
 #include "sdlemu.h"
@@ -33,6 +34,7 @@ int engineState;
 int select_exits = 0;
 
 char romFileName[PATH_MAX];
+char homePath[PATH_MAX] = "";
 
 static short sndBuffer[2*44100/50];
 static struct timeval noticeMsgTime = { 0, 0 }; // when started showing
@@ -119,6 +121,7 @@ static void scaling_update(void)
 
 void emu_Init(void)
 {
+	char *p;
 	// make temp buffer for alt renderer
 	PicoDraw2FB = malloc((8+320)*(8+240+8));
 	if (!PicoDraw2FB) {
@@ -127,15 +130,40 @@ void emu_Init(void)
 
 	// make dirs for saves, cfgs, etc.
 #ifndef WIN32
-	mkdir("mds", 0777);
-	mkdir("srm", 0777);
-	mkdir("brm", 0777);
-	mkdir("cfg", 0777);
+	p = getenv("HOME");
+	sprintf(homePath, !p ? ".picodrive/" : "%s/.picodrive/", p);
+	mkdir(homePath, 0777);
+
+	if(errno == EROFS || errno == EACCES || errno == EPERM) {
+		getcwd(homePath, 512);
+		strcat(homePath, "/.picodrive/");
+		mkdir(homePath, 0777);
+	}
+
+	sprintf(picocfgPath, "%spicoconfig.bin", homePath);
+	PicoConfigFile = picocfgPath;
+
+	sprintf(brmPath, "%sbrm/", homePath);
+	mkdir(brmPath, 0777);
+	sprintf(cfgPath, "%scfg/", homePath);
+	mkdir(cfgPath, 0777);
+	sprintf(mdsPath, "%smds/", homePath);
+	mkdir(mdsPath, 0777);
+	sprintf(srmPath, "%ssrm/", homePath);
+	mkdir(srmPath, 0777);
 #else
-	mkdir("mds");
-	mkdir("srm");
-	mkdir("brm");
-	mkdir("cfg");
+	sprintf(homePath, ".picodrive/");
+	mkdir(homePath);
+	PicoConfigFile = ".picodrive/picoconfig.bin";
+
+	sprintf(brmPath, "%sbrm/", homePath);
+	mkdir(brmPath);
+	sprintf(cfgPath, "%scfg/", homePath);
+	mkdir(cfgPath);
+	sprintf(mdsPath, "%smds/", homePath);
+	mkdir(mdsPath);
+	sprintf(srmPath, "%ssrm/", homePath);
+	mkdir(srmPath);
 #endif
 
 	PicoInit();
