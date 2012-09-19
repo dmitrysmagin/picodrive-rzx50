@@ -1360,7 +1360,9 @@ static void draw_menu_credits(void)
 	int tl_x = 15, tl_y = 64, y;
 	sdl_pd_clone_buffer2();
 
-	text_out16(tl_x, 20, "PicoDrive v" VERSION " (c) notaz, 2006,2007");
+	text_out16(tl_x, 20, "       PicoDrive SDL v" VERSION);
+	text_out16(tl_x, 30, " for Ritmix rzx50 and Dingoo a380");
+	text_out16(tl_x, 40, "       (c) notaz 2006,2007");
 	y = tl_y;
 	text_out16(tl_x, y, "Credits:");
 	text_out16(tl_x, (y+=10), "fDave: Cyclone 68000 core,");
@@ -1406,7 +1408,7 @@ static void draw_menu_root(int menu_sel)
 
 	sdl_pd_clone_buffer2();
 
-	text_out16(tl_x, 20, "PicoDrive v" VERSION);
+	text_out16(tl_x - 2, 20, "PicoDrive SDL v" VERSION);
 
 	menu_draw_selection(tl_x - 16, tl_y + menu_sel*10, 146);
 
