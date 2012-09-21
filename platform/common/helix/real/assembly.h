@@ -321,6 +321,8 @@ static __inline int CLZ(int x)
 
 //#error Unsupported platform in assembly.h
 
+typedef long long Word64;
+
 #define MADD64(SUM, X, Y) (long long)((long long)(SUM) + (long long)((long long)(X)*(long long)(Y)))
 #define SHL64(X, N) (long long)((long long)(X) << (N))
 #define SAR64(X, N) (long long)((long long)(X) >> (N))

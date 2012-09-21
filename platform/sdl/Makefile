@@ -16,13 +16,13 @@ AS = mipsel-linux-gcc
 ifeq "$(profile)" "1"
 COPT_COMMON = -O3 -fsigned-char -msoft-float -funroll-loops -Wno-unused \
 	-ffast-math -fomit-frame-pointer -fno-strength-reduce \
-	-finline-functions -G0 -march=mips32 -mtune=r4600 -mno-mips16 -fprofile-generate=/mnt/memory/emulator/picodrive
-COPT = $(COPT_COMMON)
+	-finline-functions -G0 -march=mips32 -mtune=r4600 -mno-mips16
+COPT = $(COPT_COMMON) -fprofile-generate=/mnt/memory/emulator/picodrive
 else
 COPT_COMMON = -O3 -fsigned-char -msoft-float -funroll-loops -Wno-unused \
 	-ffast-math -fomit-frame-pointer -fno-strength-reduce \
-	-finline-functions -G0 -march=mips32 -mtune=r4600 -mno-mips16 #-fprofile-use
-COPT = $(COPT_COMMON)
+	-finline-functions -G0 -march=mips32 -mtune=r4600 -mno-mips16
+COPT = $(COPT_COMMON) -fprofile-use
 endif
 
 # libraries
@@ -110,7 +110,7 @@ mkdirs:
 	@make -C ../../cpu/musashi
 
 ../common/helix/helix_mp3.a:
-	make -C ../common/helix CROSS=mipsel-linux- X86=1 TARGET=helix_mp3.a
+	make -C ../common/helix CROSS=mipsel-linux- X86=1 TARGET=helix_mp3.a CFLAGS="$(COPT) -Ipub"
 
 .c.o:
 	@echo ">>>" $<
