@@ -56,7 +56,7 @@
 #ifndef _ASSEMBLY_H
 #define _ASSEMBLY_H
 
-#if (defined _WIN32 && !defined _WIN32_WCE) || (defined __WINS__ && defined _SYMBIAN) || defined(_OPENWAVE_SIMULATOR) || defined(WINCE_EMULATOR)    /* Symbian emulator for Ix86 */
+#if 0 //(defined _WIN32 && !defined _WIN32_WCE) || (defined __WINS__ && defined _SYMBIAN) || defined(_OPENWAVE_SIMULATOR) || defined(WINCE_EMULATOR)    /* Symbian emulator for Ix86 */
 
 #pragma warning( disable : 4035 )	/* complains about inline asm not returning a value */
 
@@ -184,7 +184,7 @@ static __inline Word64 SAR64(Word64 x, int n)
 	}
 }
 
-#elif (defined _WIN32) && (defined _WIN32_WCE)
+#elif 0 //(defined _WIN32) && (defined _WIN32_WCE)
 
 /* use asm function for now (EVC++ 3.0 does horrible job compiling __int64 version) */
 #define MULSHIFT32	xmp3_MULSHIFT32
@@ -320,45 +320,14 @@ static __inline int CLZ(int x)
 #else
 
 //#error Unsupported platform in assembly.h
-#warning no assembly in assembly.h
 
-typedef long long Word64;
+#define MADD64(SUM, X, Y) (long long)((long long)(SUM) + (long long)((long long)(X)*(long long)(Y)))
+#define SHL64(X, N) (long long)((long long)(X) << (N))
+#define SAR64(X, N) (long long)((long long)(X) >> (N))
+#define MULSHIFT32(X,Y) (int)((long long)((long long)(X)*(long long)(Y)) >> 32)
+#define FASTABS(X) (abs(X))
 
-static __inline Word64 MADD64(Word64 sum, int x, int y)
-{
-	return (sum + ((Word64)x * y));
-}
-
-static __inline Word64 SHL64(Word64 x, int n)
-{
-	return x << n;
-}
-
-static __inline Word64 SAR64(Word64 x, int n)
-{
-	return x >> n;
-}
-
-static __inline int  MULSHIFT32(int x, int y)
-{
-	long long res;
-
-	res = x * y;
-	return (int) (res >> 32);
-}
-
-static __inline int FASTABS(int x)
-{
-	int sign;
-
-	sign = x >> (sizeof(int) * 8 - 1);
-	x ^= sign;
-	x -= sign;
-
-	return x;
-}
-
-static __inline int CLZ(int x)
+static inline int CLZ(int x)
 {
 	int numZeros;
 

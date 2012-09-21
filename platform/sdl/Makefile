@@ -21,7 +21,7 @@ COPT = $(COPT_COMMON)
 else
 COPT_COMMON = -O3 -fsigned-char -msoft-float -funroll-loops -Wno-unused \
 	-ffast-math -fomit-frame-pointer -fno-strength-reduce \
-	-finline-functions -G0 -march=mips32 -mtune=r4600 -mno-mips16 -fprofile-use
+	-finline-functions -G0 -march=mips32 -mtune=r4600 -mno-mips16 #-fprofile-use
 COPT = $(COPT_COMMON)
 endif
 
@@ -33,7 +33,7 @@ OBJS += main.o menu.o emu.o blit.o sdlemu.o log_io.o scaler.o
 
 # common
 OBJS += platform/common/emu.o platform/common/menu.o platform/common/fonts.o \
-		platform/common/readpng.o platform/common/mp3_helix.o
+		platform/common/readpng.o platform/common/mp3_helix.o ../common/helix/helix_mp3.a
 
 # Pico
 OBJS += Pico/Area.o Pico/Cart.o Pico/Memory.o Pico/Misc.o Pico/Pico.o Pico/Sek.o \
@@ -84,7 +84,8 @@ endif
 vpath %.c = ../..
 vpath %.s = ../..
 
-DIRS = platform platform/common Pico Pico/cd Pico/sound zlib unzip \
+DIRS = platform platform/common platform/common/helix platform/common/helix/real \
+	Pico Pico/cd Pico/sound zlib unzip \
 	cpu cpu/musashi cpu/fame cpu/mz80 cpu/cz80
 
 all: mkdirs PicoDrive
@@ -94,6 +95,7 @@ clean: tidy
 
 tidy:
 	$(RM) $(OBJS)
+	make -C ../common/helix CROSS=mipsel-linux- X86=1 TARGET=helix_mp3.a clean
 	#rm -rf $(DIRS)
 
 PicoDrive : $(OBJS) 
@@ -107,6 +109,9 @@ mkdirs:
 ../../cpu/musashi/m68kops.c :
 	@make -C ../../cpu/musashi
 
+../common/helix/helix_mp3.a:
+	make -C ../common/helix CROSS=mipsel-linux- X86=1 TARGET=helix_mp3.a
+
 .c.o:
 	@echo ">>>" $<
 	$(GCC) $(COPT) $(DEFINC) -c $< -o $@
@@ -116,6 +121,3 @@ mkdirs:
 	$(AS) -march=mips32 -mtune=r4600 $< -o $@
 
 cpu/fame/famec.o : ../../cpu/fame/famec.c ../../cpu/fame/famec_opcodes.h
-
-
-

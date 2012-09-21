@@ -61,7 +61,7 @@
 #elif defined(_OPENWAVE_SIMULATOR) || defined(_OPENWAVE_ARMULATOR)
 #
 #else
-#error No platform defined. See valid options in mp3dec.h
+//#error No platform defined. See valid options in mp3dec.h
 #endif
 
 #ifdef __cplusplus
