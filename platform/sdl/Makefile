@@ -110,7 +110,7 @@ mkdirs:
 	@make -C ../../cpu/musashi
 
 ../common/helix/helix_mp3.a:
-	make -C ../common/helix CROSS=mipsel-linux- X86=1 TARGET=helix_mp3.a CFLAGS="$(COPT) -Ipub"
+	make -C ../common/helix CROSS=mipsel-linux- X86=1 TARGET=helix_mp3.a CFLAGS="$(COPT_COMMON) -Ipub"
 
 .c.o:
 	@echo ">>>" $<
