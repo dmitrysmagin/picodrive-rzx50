@@ -4,8 +4,8 @@
 use_fame = 1
 #use_mz80 = 1
 
-# profile = 1
-
+#PROFILE = -fprofile-generate=/mnt/memory/emulator/picodrive
+#PROFILE = -fprofile-use
 
 DEFINC = -I../.. -I. -D__SDL__ -D_UNZIP_SUPPORT
 
@@ -13,17 +13,10 @@ GCC = mipsel-linux-gcc
 STRIP = mipsel-linux-strip
 AS = mipsel-linux-gcc
 
-ifeq "$(profile)" "1"
-COPT_COMMON = -O3 -fsigned-char -msoft-float -funroll-loops -Wno-unused \
+COPT_COMMON = -O3 -fsigned-char -funroll-loops -Wno-unused \
 	-ffast-math -fomit-frame-pointer -fno-strength-reduce \
 	-finline-functions -G0 -march=mips32 -mtune=r4600 -mno-mips16
-COPT = $(COPT_COMMON) -fprofile-generate=/mnt/memory/emulator/picodrive
-else
-COPT_COMMON = -O3 -fsigned-char -msoft-float -funroll-loops -Wno-unused \
-	-ffast-math -fomit-frame-pointer -fno-strength-reduce \
-	-finline-functions -G0 -march=mips32 -mtune=r4600 -mno-mips16
-COPT = $(COPT_COMMON) -fprofile-use
-endif
+COPT = $(COPT_COMMON) $(PROFILE)
 
 # libraries
 LDFLAGS += -lSDL -lm -lpng
@@ -84,7 +77,7 @@ endif
 vpath %.c = ../..
 vpath %.s = ../..
 
-DIRS = platform platform/common platform/common/helix platform/common/helix/real \
+DIRS = bin platform platform/common platform/common/helix platform/common/helix/real \
 	Pico Pico/cd Pico/sound zlib unzip \
 	cpu cpu/musashi cpu/fame cpu/mz80 cpu/cz80
 

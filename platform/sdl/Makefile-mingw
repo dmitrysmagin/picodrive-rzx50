@@ -80,7 +80,7 @@ endif
 vpath %.c = ../..
 vpath %.s = ../..
 
-DIRS = platform platform/common platform/common/helix platform/common/helix/real \
+DIRS = bin platform platform/common platform/common/helix platform/common/helix/real \
 	Pico Pico/cd Pico/sound zlib unzip \
 	cpu cpu/musashi cpu/fame cpu/mz80 cpu/cz80
 
