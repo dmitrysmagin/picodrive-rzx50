@@ -115,6 +115,22 @@ int emu_findBios(int region, char **bios_file)
 		strcat(bios_path, ".zip");
 		f = fopen(bios_path, "rb");
 		if (f) break;
+
+		// also search in ~/.picodrive
+		extern char *homePath;
+
+		if(homePath) {
+			strcpy(bios_path, homePath);
+			strcat(bios_path, files[i]);
+			strcat(bios_path, ".bin");
+			f = fopen(bios_path, "rb");
+			if (f) break;
+
+			bios_path[strlen(bios_path) - 4] = 0;
+			strcat(bios_path, ".zip");
+			f = fopen(bios_path, "rb");
+			if (f) break;
+		}
 	}
 
 	if (f) {
