@@ -84,7 +84,7 @@ gzFile zip2gz(ZIP* zip, struct zipent* ent)
             return NULL;
         }
 
-        if (ent->os_needed_to_extract != 0x00) {
+        if (!(ent->os_needed_to_extract == 0x00 || ent->os_needed_to_extract == 0x03)) {
             errormsg("OS not supported", ERROR_UNSUPPORTED,zip->zip);
             return NULL;
         }
